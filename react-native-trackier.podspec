@@ -4,7 +4,7 @@ package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
   s.name           = package['name']
-  s.version        = '1.6.69'
+  s.version        = '1.6.73'
   s.summary        = package['title']
   s.description    = package['description']
   s.license        = package['license']
@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency 'trackier-ios-sdk', '1.6.60'
+  s.dependency 'trackier-ios-sdk', '1.6.73'
 end
 

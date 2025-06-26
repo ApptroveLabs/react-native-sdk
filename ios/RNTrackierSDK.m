@@ -35,7 +35,7 @@ RCT_EXTERN_METHOD(parseDeepLink: (NSString *)url)
 
 RCT_EXTERN_METHOD(setLocalRefTrack:(BOOL *)value withDelim: (NSString *)delimeter)
 
-RCT_EXTERN_METHOD(setUserAdditionalDetails:(NSString *)key withValue: (NSString *)value)
+RCT_EXTERN_METHOD(setUserAdditionalDetails:(NSDictionary *)dict)
 
 RCT_EXTERN_METHOD(waitForATTUserAuthorization:(NSInteger *)timeoutInterval)
 
@@ -82,5 +82,9 @@ RCT_EXTERN_METHOD(getIsRetargeting:(RCTPromiseResolveBlock)resolve rejecter:(RCT
 RCT_EXTERN_METHOD(getTrackierId:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(storeRetargetting:(NSString *)url)
+
+RCT_EXTERN_METHOD(createDynamicLink:(NSDictionary *)config resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(resolveDeeplinkUrl:(NSString *)url resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 @end
 

@@ -15,6 +15,7 @@ declare module 'react-native-trackier' {
         setManualMode: (value: boolean) => void
         disableOrganicTracking: (value: boolean) => void
         setAttributionParams: (params: AttributionParams) => void
+        setRegion: (value: string) => void
     }
  
     export class TrackierSDK {
@@ -37,6 +38,8 @@ declare module 'react-native-trackier' {
         setIMEI: (imei1: string, imei2: string) => void
         setMacAddress: (value: string) => void
         fireInstall: () => void 
+        createDynamicLink: (linkConfig: string) => void
+        resolveDeeplinkUrl: (url: string) => void
     }
 
     export class TrackierEvent {

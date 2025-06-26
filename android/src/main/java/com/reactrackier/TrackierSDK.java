@@ -37,7 +37,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		getReactApplicationContext(), initializeMap.getString("appToken"),
 		initializeMap.getString("environment"));
 		sdkConfig.setSDKType("react_native_sdk");
-		sdkConfig.setSDKVersion("1.6.69");
+		sdkConfig.setSDKVersion("1.6.73");
 		sdkConfig.setAppSecret(initializeMap.getString("secretId"), initializeMap.getString("secretKey"));
 		sdkConfig.setManualMode(initializeMap.getBoolean("manualMode"));
 		sdkConfig.disableOrganicTracking(initializeMap.getBoolean("disableOrganicTrack"));
@@ -228,20 +228,166 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		com.trackier.sdk.TrackierSDK.setMacAddress(macAddress);
 	}
 
+		@ReactMethod
+	public void createDynamicLink(ReadableMap config, Promise promise) {
+		try {
+			DynamicLink.Builder builder = new DynamicLink.Builder();
+
+			if (config.hasKey("templateId")) {
+				builder.setTemplateId(config.getString("templateId"));
+			}
+
+			if (config.hasKey("link")) {
+				builder.setLink(Uri.parse(config.getString("link")));
+			}
+
+			if (config.hasKey("domainUriPrefix")) {
+				builder.setDomainUriPrefix(config.getString("domainUriPrefix"));
+			}
+
+			if (config.hasKey("deepLinkValue")) {
+				builder.setDeepLinkValue(config.getString("deepLinkValue"));
+			}
+
+			if (config.hasKey("androidParameters")) {
+				ReadableMap androidParams = config.getMap("androidParameters");
+				AndroidParameters.Builder androidBuilder = new AndroidParameters.Builder();
+				if (androidParams.hasKey("redirectLink")) {
+					androidBuilder.setRedirectLink(androidParams.getString("redirectLink"));
+				}
+				builder.setAndroidParameters(androidBuilder.build());
+			}
+
+			if (config.hasKey("iosParameters")) {
+				ReadableMap iosParams = config.getMap("iosParameters");
+				IosParameters.Builder iosBuilder = new IosParameters.Builder();
+				if (iosParams.hasKey("redirectLink")) {
+					iosBuilder.setRedirectLink(iosParams.getString("redirectLink"));
+				}
+				builder.setIosParameters(iosBuilder.build());
+			}
+
+			if (config.hasKey("desktopParameters")) {
+				ReadableMap desktopParams = config.getMap("desktopParameters");
+				DesktopParameters.Builder desktopBuilder = new DesktopParameters.Builder();
+				if (desktopParams.hasKey("redirectLink")) {
+					desktopBuilder.setRedirectLink(desktopParams.getString("redirectLink"));
+				}
+				builder.setDesktopParameters(desktopBuilder.build());
+			}
+
+			if (config.hasKey("socialMetaTagParameters")) {
+				ReadableMap meta = config.getMap("socialMetaTagParameters");
+				SocialMetaTagParameters.Builder metaBuilder = new SocialMetaTagParameters.Builder();
+				if (meta.hasKey("title")) {
+					metaBuilder.setTitle(meta.getString("title"));
+				}
+				if (meta.hasKey("description")) {
+					metaBuilder.setDescription(meta.getString("description"));
+				}
+				if (meta.hasKey("imageLink")) {
+					metaBuilder.setImageLink(meta.getString("imageLink"));
+				}
+				builder.setSocialMetaTagParameters(metaBuilder.build());
+			}
+
+			if (config.hasKey("sdkParameters")) {
+				ReadableMap sdkParams = config.getMap("sdkParameters");
+				Map<String, String> paramMap = new HashMap<>();
+				ReadableMapKeySetIterator iterator = sdkParams.keySetIterator();
+				while (iterator.hasNextKey()) {
+					String key = iterator.nextKey();
+					paramMap.put(key, sdkParams.getString(key));
+				}
+				builder.setSDKParameters(paramMap);
+			}
+
+			if (config.hasKey("attributionParameters")) {
+				ReadableMap attrParams = config.getMap("attributionParameters");
+
+				String channel = attrParams.hasKey("channel") ? attrParams.getString("channel") : "";
+				String campaign = attrParams.hasKey("campaign") ? attrParams.getString("campaign") : "";
+				String mediaSource = attrParams.hasKey("mediaSource") ? attrParams.getString("mediaSource") : "";
+
+				String p1 = attrParams.hasKey("p1") ? attrParams.getString("p1") : "";
+				String p2 = attrParams.hasKey("p2") ? attrParams.getString("p2") : "";
+				String p3 = attrParams.hasKey("p3") ? attrParams.getString("p3") : "";
+				String p4 = attrParams.hasKey("p4") ? attrParams.getString("p4") : "";
+				String p5 = attrParams.hasKey("p5") ? attrParams.getString("p5") : "";
+
+				builder.setAttributionParameters(channel, campaign, mediaSource, p1, p2, p3, p4, p5);
+			}
+
+			DynamicLink dynamicLink = builder.build();
+
+			com.trackier.sdk.TrackierSDK.createDynamicLink(
+					dynamicLink,
+					dynamicLinkUrl -> {
+						promise.resolve(dynamicLinkUrl);
+						return Unit.INSTANCE;
+					},
+					error -> {
+						promise.reject("CREATE_DYNAMIC_LINK_FAILED", error);
+						return Unit.INSTANCE;
+					}
+			);
+
+		} catch (Exception e) {
+			promise.reject("CREATE_DYNAMIC_LINK_EXCEPTION", e);
+		}
+	}
+
+	@ReactMethod
+	public void resolveDeeplinkUrl(String url, Promise promise) {
+		com.trackier.sdk.TrackierSDK.INSTANCE.resolveDeeplinkUrl(
+				url,
+				resultUrl -> {
+					try {
+						WritableMap result = Arguments.createMap();
+						result.putString("url", resultUrl.getUrl());
+
+						WritableMap sdkParamsMap = Arguments.createMap();
+						Map<String, Object> sdkParams = resultUrl.getSdkParams();
+						if (sdkParams != null) {
+							for (Map.Entry<String, Object> entry : sdkParams.entrySet()) {
+								sdkParamsMap.putString(entry.getKey(), entry.getValue().toString());
+							}
+						}
+						result.putMap("sdkParams", sdkParamsMap);
+						promise.resolve(result);
+					} catch (Exception e) {
+						promise.reject("DL_PARSE_ERROR", e);
+					}
+					return Unit.INSTANCE;
+				},
+				error -> {
+					promise.reject("RESOLVE_DEEPLINK_FAILED", error);
+					return Unit.INSTANCE;
+				}
+		);
+	}
+
 
 	@ReactMethod
 	public void setUserAdditionalDetails(ReadableMap userAdditionalDetailsMap) {
-		// if (checkKey(userAdditionalDetailsMap, "userAdditionalMap")) {
-		// Map<String, Object> userAdditionalDetail =
-		// TrackierUtil.toMap(userAdditionalDetailsMap.getMap("userAdditionalMap"));
-		// Map<String, Object> ev = new LinkedHashMap<String, Object>();
-		// if (userAdditionalDetail != null) {
-		// for (Map.Entry<String, Object> entry : userAdditionalDetail.entrySet()) {
-		// ev.put(entry.getKey(), entry.getValue().toString());
-		// }
-		// }
-		// com.trackier.sdk.TrackierSDK.setUserAdditionalDetails(userAdditionalDetail);
-		// }
+		Log.d("trackiersdk", "JS map received: " + userAdditionalDetailsMap);
+
+		if (checkKey(userAdditionalDetailsMap, "userAdditionalMap")) {
+			ReadableMap map = userAdditionalDetailsMap.getMap("userAdditionalMap");
+
+			if (map != null) {
+				Map<String, Object> userAdditionalDetail = TrackierUtil.toMap(map);
+
+				// Optional: clean/map to string values if needed
+				Map<String, Object> ev = new LinkedHashMap<>();
+				for (Map.Entry<String, Object> entry : userAdditionalDetail.entrySet()) {
+					ev.put(entry.getKey(), entry.getValue() != null ? entry.getValue().toString() : "");
+				}
+
+				Log.d("trackiersdk", "Passing to SDK: " + ev.toString());
+				com.trackier.sdk.TrackierSDK.setUserAdditionalDetails(ev); // this calls your Kotlin method
+			}
+		}
 	}
 
 	@ReactMethod

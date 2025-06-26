@@ -38,8 +38,8 @@ declare module 'react-native-trackier' {
         setIMEI: (imei1: string, imei2: string) => void
         setMacAddress: (value: string) => void
         fireInstall: () => void 
-        createDynamicLink: () => void
-        resolveDeeplinkUrl: () => void
+        createDynamicLink: (linkConfig: string) => void
+        resolveDeeplinkUrl: (url: string) => void
     }
 
     export class TrackierEvent {

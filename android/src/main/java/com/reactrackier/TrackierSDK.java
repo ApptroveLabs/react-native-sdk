@@ -5,17 +5,30 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
+
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.trackier.sdk.DeepLink;
 import com.trackier.sdk.DeepLinkListener;
 import com.trackier.sdk.AttributionParams;
+import com.trackier.sdk.dynamic_link.AndroidParameters;
+import com.trackier.sdk.dynamic_link.DesktopParameters;
+import com.trackier.sdk.dynamic_link.DynamicLink;
+import com.trackier.sdk.dynamic_link.IosParameters;
+import com.trackier.sdk.dynamic_link.SocialMetaTagParameters;
+
+import kotlin.Unit;
 
 public class TrackierSDK extends ReactContextBaseJavaModule {
 

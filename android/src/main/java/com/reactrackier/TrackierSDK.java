@@ -22,6 +22,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.trackier.sdk.DeepLink;
 import com.trackier.sdk.DeepLinkListener;
 import com.trackier.sdk.AttributionParams;
+import com.trackier.sdk.TrackierSDKConfig;
 import com.trackier.sdk.dynamic_link.AndroidParameters;
 import com.trackier.sdk.dynamic_link.DesktopParameters;
 import com.trackier.sdk.dynamic_link.DynamicLink;
@@ -85,6 +86,25 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 					sendEvent(getReactApplicationContext(), "trackier_deferredDeeplink", deepLink.getUrl());
 				}
 			});
+		}
+		if (initializeMap.hasKey("region")) {
+			String regionStr = initializeMap.getString("region");
+			if (regionStr != null) {
+				TrackierSDKConfig.Region selectedRegion;
+
+				switch (regionStr.toUpperCase()) {
+					case "IN":
+						selectedRegion = TrackierSDKConfig.Region.IN;
+						break;
+					case "GLOBAL":
+						selectedRegion = TrackierSDKConfig.Region.GLOBAL;
+						break;
+					default:
+						Log.w("TrackierSDK", "Unknown region: " + regionStr);
+						return;
+				}
+				sdkConfig.setRegion(selectedRegion);
+			}
 		}
 		com.trackier.sdk.TrackierSDK.initialize(sdkConfig);
 	}

@@ -23,6 +23,7 @@ var TrackierConfig = function(appToken,environment) {
 	this.manualMode = false;
 	this.disableOrganicTrack = false;
 	this.attributionParams = {};
+	this.region = ''; // Default region
 }
 
 var TrackierSDK = {};
@@ -50,6 +51,10 @@ TrackierConfig.prototype.setAttributionParams = function (params) {
 		return;
 	}
 	this.attributionParams = params; 
+};
+
+TrackierConfig.prototype.setRegion = function (value) {
+	this.region = value;
 };
 
 TrackierSDK.setEnabled = function (value) {
@@ -85,9 +90,13 @@ TrackierSDK.setLocalRefTrack = function (value, delimeter) {
 	module_trackier.setLocalRefTrack(value, delimeter)
 }
 
-TrackierSDK.setUserAdditionalDetails = function (key, value) {
-	module_trackier.setUserAdditionalDetails(value, delimeter)
-}
+TrackierSDK.setUserAdditionalDetails = function (userAdditionalMap) {
+	if (Platform.OS === 'android') {
+		module_trackier.setUserAdditionalDetails({userAdditionalMap});
+		} else if (Platform.OS === 'ios') {
+		module_trackier.setUserAdditionalDetails(userAdditionalMap);
+	}
+};
 
 TrackierSDK.waitForATTUserAuthorization = function (timeoutInterval) {
 	module_trackier.waitForATTUserAuthorization(timeoutInterval)
@@ -178,6 +187,14 @@ TrackierSDK.getIsRetargeting = function () {
 	return module_trackier.getIsRetargeting();
 }
 
+TrackierSDK.createDynamicLink = function (linkConfig) {
+	return module_trackier.createDynamicLink(linkConfig);
+};
+
+TrackierSDK.resolveDeeplinkUrl = function (url) {
+	return module_trackier.resolveDeeplinkUrl(url);
+};
+
 TrackierSDK.trackEvent = function(trackierEvent) {
 	let isValidArgs = true;
 	let props = ['eventId', 'orderId', 'currency', 'couponCode', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10'];
@@ -200,6 +217,9 @@ TrackierSDK.trackEvent = function(trackierEvent) {
 TrackierConfig.EnvironmentDevelopment = "development";
 TrackierConfig.EnvironmentProduction = "production";
 TrackierConfig.EnvironmentTesting = "testing";
+TrackierConfig.IN = "in";
+TrackierConfig.GLOBAL = "global";
+
 
 TrackierConfig.prototype.setDeferredDeeplinkCallbackListener = function(deferredDeeplinkCallbackListener) {
 	if (Platform.OS === "android" || Platform.OS === "ios") {

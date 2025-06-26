@@ -35,7 +35,7 @@ class RNTrackierSDK: RCTEventEmitter, DeepLinkListener {
 	
 	open override func supportedEvents() -> [String] {
 		["trackier_deferredDeeplink"]
-	  }
+		}
 
 	@objc func initializeSDK(_ dict: NSDictionary) -> Void {
 		let appToken = dict["appToken"] as! String;
@@ -44,9 +44,21 @@ class RNTrackierSDK: RCTEventEmitter, DeepLinkListener {
 		let config = TrackierSDKConfig(appToken: appToken , env: environment)
 		config.setSDKType(sdkType: "react_native_sdk")
 		config.setAppSecret(secretId: dict["secretId"] as! String, secretKey: dict["secretKey"] as! String)
-		config.setSDKVersion(sdkVersion: "1.6.69")
+		config.setSDKVersion(sdkVersion: "1.6.73")
 		if (deeplinking != nil) {
 			config.setDeeplinkListerner(listener: self)
+		}
+		if let regionStr = dict["region"] as? String {
+			switch regionStr.lowercased() {
+			case "in":
+					config.setRegion(.IN)
+					print("india region has been set")
+			case "global":
+					config.setRegion(.GLOBAL)
+					print("GLobal region has been set")
+			default:
+					config.setRegion(.NONE)
+			}
 		}
 		TrackierSDK.initialize(config: config)
 	}
@@ -200,8 +212,14 @@ class RNTrackierSDK: RCTEventEmitter, DeepLinkListener {
 		// Do nothing, android only method
 	}
 
-	@objc func setUserAdditionalDetails(_ key: String, withValue value: String) {
-		// TODO
+	@objc public func setUserAdditionalDetails(_ userAdditionalDetailsMap: NSDictionary) {
+		var ev: [String: String] = [:]
+		for (key, value) in userAdditionalDetailsMap {
+				if let keyStr = key as? String {
+						ev[keyStr] = "\(value)"
+				}
+		}
+		TrackierSDK.setUserAdditionalDetails(userAdditionalDetails: ev)
 	}
 
 	@objc func fireInstall() {
@@ -212,7 +230,7 @@ class RNTrackierSDK: RCTEventEmitter, DeepLinkListener {
 		// Do nothing, android only method
 	}
 	
-	 @objc func setIMEI(_ key: String, withValue Value: String) {
+	@objc func setIMEI(_ key: String, withValue Value: String) {
 		// Do nothing, android only method
 	}
 
@@ -224,5 +242,116 @@ class RNTrackierSDK: RCTEventEmitter, DeepLinkListener {
 		// Do nothing
 	}
 
+	@objc func createDynamicLink(_ config: NSDictionary, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+		let builder = DynamicLink.Builder()
+
+		if let templateId = config["templateId"] as? String {
+			builder.setTemplateId(templateId)
+		}
+
+		if let link = config["link"] as? String {
+				builder.setLink(link)
+		}
+
+		if let domainUriPrefix = config["domainUriPrefix"] as? String {
+			builder.setDomainUriPrefix(domainUriPrefix)
+		}
+
+		if let deepLinkValue = config["deepLinkValue"] as? String {
+			builder.setDeepLinkValue(deepLinkValue)
+		}
+
+		if let androidParams = config["androidParameters"] as? NSDictionary {
+			let androidBuilder = AndroidParameters.Builder()
+			if let redirectLink = androidParams["redirectLink"] as? String {
+				androidBuilder.setRedirectLink(redirectLink)
+			}
+			builder.setAndroidParameters(androidBuilder.build())
+		}
+
+		if let iosParams = config["iosParameters"] as? NSDictionary {
+			let iosBuilder = IosParameters.Builder()
+			if let redirectLink = iosParams["redirectLink"] as? String {
+				iosBuilder.setRedirectLink(redirectLink)
+			}
+			builder.setIosParameters(iosBuilder.build())
+		}
+
+		if let desktopParams = config["desktopParameters"] as? NSDictionary {
+			let desktopBuilder = DesktopParameters.Builder()
+			if let redirectLink = desktopParams["redirectLink"] as? String {
+				desktopBuilder.setRedirectLink(redirectLink)
+			}
+			builder.setDesktopParameters(desktopBuilder.build())
+		}
+
+		if let meta = config["socialMetaTagParameters"] as? NSDictionary {
+			let metaBuilder = SocialMetaTagParameters.Builder()
+			if let title = meta["title"] as? String {
+				metaBuilder.setTitle(title)
+			}
+			if let description = meta["description"] as? String {
+				metaBuilder.setDescription(description)
+			}
+			if let imageLink = meta["imageLink"] as? String {
+				metaBuilder.setImageLink(imageLink)
+			}
+			builder.setSocialMetaTagParameters(metaBuilder.build())
+		}
+
+		if let sdkParams = config["sdkParameters"] as? [String: String] {
+			builder.setSDKParameters(sdkParams)
+		}
+
+		if let attrParams = config["attributionParameters"] as? NSDictionary {
+			let channel = attrParams["channel"] as? String ?? ""
+			let campaign = attrParams["campaign"] as? String ?? ""
+			let mediaSource = attrParams["mediaSource"] as? String ?? ""
+			let p1 = attrParams["p1"] as? String ?? ""
+			let p2 = attrParams["p2"] as? String ?? ""
+			let p3 = attrParams["p3"] as? String ?? ""
+			let p4 = attrParams["p4"] as? String ?? ""
+			let p5 = attrParams["p5"] as? String ?? ""
+			builder.setAttributionParameters(channel: channel, campaign: campaign, mediaSource: mediaSource, p1: p1, p2: p2, p3: p3, p4: p4, p5: p5)
+		}
+
+		let dynamicLink = builder.build()
+		if #available(iOS 13.0, *) {
+				TrackierSDK.createDynamicLink(dynamicLink: dynamicLink, onSuccess: { url in
+						resolve(url)
+				}, onFailure: { error in
+						reject("CREATE_DYNAMIC_LINK_FAILED", error, nil)
+				})
+		} else {
+				// Fallback on earlier versions
+		}
+	}
+
+	@objc func resolveDeeplinkUrl(_ url: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+		if #available(iOS 13.0, *) {
+				TrackierSDK.resolveDeeplinkUrl(inputUrl: url) { result in
+						switch result {
+						case .success(let dlData):
+								var resultMap: [String: Any] = [:]
+								resultMap["url"] = dlData.url
+								
+								if let sdkParams = dlData.sdkParams {
+										var sdkParamsMap: [String: String] = [:]
+										for (key, value) in sdkParams {
+												sdkParamsMap[key] = "\(value)"
+										}
+										resultMap["sdkParams"] = sdkParamsMap
+								}
+								
+								resolve(resultMap)
+								
+						case .failure(let error):
+								reject("RESOLVE_DEEPLINK_FAILED", error.localizedDescription, error)
+						}
+				}
+		} else {
+				// Fallback on earlier versions
+		}
+	}
 }
 

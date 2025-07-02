@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "590241156446",
+    "project_id": "vistmarket-5a207",
+    "storage_bucket": "vistmarket-5a207.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590241156446:android:1b94f1ba17b7821bfad3cf",
+        "android_client_info": {
+          "package_name": "com.myexample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZIEOY0MpDXsABUL0o3ucSmG2M_Xf4eIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590241156446:android:4e102db8a0945713fad3cf",
+        "android_client_info": {
+          "package_name": "com.trackier.vistmarket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZIEOY0MpDXsABUL0o3ucSmG2M_Xf4eIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

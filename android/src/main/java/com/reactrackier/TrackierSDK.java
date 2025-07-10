@@ -51,7 +51,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		getReactApplicationContext(), initializeMap.getString("appToken"),
 		initializeMap.getString("environment"));
 		sdkConfig.setSDKType("react_native_sdk");
-		sdkConfig.setSDKVersion("1.6.73");
+		sdkConfig.setSDKVersion("1.6.74");
 		sdkConfig.setAppSecret(initializeMap.getString("secretId"), initializeMap.getString("secretKey"));
 		sdkConfig.setManualMode(initializeMap.getBoolean("manualMode"));
 		sdkConfig.disableOrganicTracking(initializeMap.getBoolean("disableOrganicTrack"));
@@ -90,7 +90,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		if (initializeMap.hasKey("region")) {
 			String regionStr = initializeMap.getString("region");
 			if (regionStr != null) {
-				TrackierSDKConfig.Region selectedRegion;
+				TrackierSDKConfig.Region selectedRegion = null;
 
 				switch (regionStr.toUpperCase()) {
 					case "IN":
@@ -100,10 +100,13 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 						selectedRegion = TrackierSDKConfig.Region.GLOBAL;
 						break;
 					default:
-						Log.w("TrackierSDK", "Unknown region: " + regionStr);
-						return;
+						android.util.Log.w("React-Native", "Unknown region: " + regionStr);
+						break;
 				}
-				sdkConfig.setRegion(selectedRegion);
+
+				if (selectedRegion != null) {
+					sdkConfig.setRegion(selectedRegion);
+				}
 			}
 		}
 		com.trackier.sdk.TrackierSDK.initialize(sdkConfig);

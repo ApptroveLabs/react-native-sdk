@@ -2,7 +2,7 @@
 {
   "name": "react-native-trackier",
   "title": "React Native Trackier SDK",
-  "version": "1.6.73",
+  "version": "1.6.74",
   "description": "This is the React Native Trackier SDK",
   "main": "index.js",
   "files": [

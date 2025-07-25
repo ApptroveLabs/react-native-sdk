@@ -10,6 +10,7 @@
     "android",
     "index.js",
     "ios",
+    "react-native.config.js",
     "react-native-trackier.podspec"
   ],
   "scripts": {

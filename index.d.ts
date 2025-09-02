@@ -16,6 +16,8 @@ declare module 'react-native-trackier' {
         disableOrganicTracking: (value: boolean) => void
         setAttributionParams: (params: AttributionParams) => void
         setRegion: (value: string) => void
+        setFacebookAppId: (value: string) => void
+        setAndroidId: (value: string) => void
     }
  
     export class TrackierSDK {

@@ -51,7 +51,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		getReactApplicationContext(), initializeMap.getString("appToken"),
 		initializeMap.getString("environment"));
 		sdkConfig.setSDKType("react_native_sdk");
-		sdkConfig.setSDKVersion("1.6.74");
+		sdkConfig.setSDKVersion("1.6.75");
 		sdkConfig.setAppSecret(initializeMap.getString("secretId"), initializeMap.getString("secretKey"));
 		sdkConfig.setManualMode(initializeMap.getBoolean("manualMode"));
 		sdkConfig.disableOrganicTracking(initializeMap.getBoolean("disableOrganicTrack"));
@@ -107,6 +107,20 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 				if (selectedRegion != null) {
 					sdkConfig.setRegion(selectedRegion);
 				}
+			}
+		}
+		
+		if (initializeMap.hasKey("facebookAppId")) {
+			String facebookAppId = initializeMap.getString("facebookAppId");
+			if (facebookAppId != null && !facebookAppId.isEmpty()) {
+				sdkConfig.setFacebookAppId(facebookAppId);
+			}
+		}
+		
+		if (initializeMap.hasKey("androidId")) {
+			String androidId = initializeMap.getString("androidId");
+			if (androidId != null && !androidId.isEmpty()) {
+				sdkConfig.setAndroidId(androidId);
 			}
 		}
 		com.trackier.sdk.TrackierSDK.initialize(sdkConfig);

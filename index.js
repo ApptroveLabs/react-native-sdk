@@ -24,6 +24,8 @@ var TrackierConfig = function(appToken,environment) {
 	this.disableOrganicTrack = false;
 	this.attributionParams = {};
 	this.region = ''; // Default region
+	this.facebookAppId = ''; // Default Facebook App ID
+	this.androidId = ''; // Default Android ID
 }
 
 var TrackierSDK = {};
@@ -55,6 +57,14 @@ TrackierConfig.prototype.setAttributionParams = function (params) {
 
 TrackierConfig.prototype.setRegion = function (value) {
 	this.region = value;
+};
+
+TrackierConfig.prototype.setFacebookAppId = function (value) {
+	this.facebookAppId = value;
+};
+
+TrackierConfig.prototype.setAndroidId = function (value) {
+	this.androidId = value;
 };
 
 TrackierSDK.setEnabled = function (value) {

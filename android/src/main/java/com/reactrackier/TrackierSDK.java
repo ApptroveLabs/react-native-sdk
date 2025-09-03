@@ -153,7 +153,20 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 				}
 			}
 		}
-
+		
+		if (initializeMap.hasKey("facebookAppId")) {
+			String facebookAppId = initializeMap.getString("facebookAppId");
+			if (facebookAppId != null && !facebookAppId.isEmpty()) {
+				sdkConfig.setFacebookAppId(facebookAppId);
+			}
+		}
+		
+		if (initializeMap.hasKey("androidId")) {
+			String androidId = initializeMap.getString("androidId");
+			if (androidId != null && !androidId.isEmpty()) {
+				sdkConfig.setAndroidId(androidId);
+			}
+		}
 		com.trackier.sdk.TrackierSDK.initialize(sdkConfig);
 	}
 

@@ -51,7 +51,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		getReactApplicationContext(), initializeMap.getString("appToken"),
 		initializeMap.getString("environment"));
 		sdkConfig.setSDKType("react_native_sdk");
-		sdkConfig.setSDKVersion("1.6.74");
+		sdkConfig.setSDKVersion("1.6.75");
 		sdkConfig.setAppSecret(initializeMap.getString("secretId"), initializeMap.getString("secretKey"));
 		sdkConfig.setManualMode(initializeMap.getBoolean("manualMode"));
 		sdkConfig.disableOrganicTracking(initializeMap.getBoolean("disableOrganicTrack"));
@@ -83,7 +83,51 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 			sdkConfig.setDeepLinkListener(new DeepLinkListener() {
 				@Override
 				public void onDeepLinking(@NonNull DeepLink deepLink) {
-					sendEvent(getReactApplicationContext(), "trackier_deferredDeeplink", deepLink.getUrl());
+					// Create comprehensive deep link data object with all available fields
+					WritableMap deepLinkData = Arguments.createMap();
+					deepLinkData.putString("url", deepLink.getUrl());
+					deepLinkData.putBoolean("isDeferred", deepLink.isDeferred());
+					deepLinkData.putString("deepLinkValue", deepLink.getDeepLinkValue());
+					deepLinkData.putString("partnerId", deepLink.getPartnerId());
+					deepLinkData.putString("pid", deepLink.getPartnerId()); 
+					deepLinkData.putString("siteId", deepLink.getSiteId());
+					deepLinkData.putString("sid", deepLink.getSiteId()); 
+					deepLinkData.putString("subSiteId", deepLink.getSubSiteId());
+					deepLinkData.putString("ssid", deepLink.getSubSiteId()); 
+					deepLinkData.putString("campaign", deepLink.getCampaign());
+					deepLinkData.putString("camp", deepLink.getCampaign()); 
+					deepLinkData.putString("p1", deepLink.getP1());
+					deepLinkData.putString("p2", deepLink.getP2());
+					deepLinkData.putString("p3", deepLink.getP3());
+					deepLinkData.putString("p4", deepLink.getP4());
+					deepLinkData.putString("p5", deepLink.getP5());
+					
+					// Add SDK params if available
+					if (deepLink.getSdkParams() != null) {
+						WritableMap sdkParams = Arguments.createMap();
+						for (Map.Entry<String, Object> entry : deepLink.getSdkParams().entrySet()) {
+							if (entry.getValue() instanceof String) {
+								sdkParams.putString(entry.getKey(), (String) entry.getValue());
+							} else if (entry.getValue() instanceof Number) {
+								sdkParams.putDouble(entry.getKey(), ((Number) entry.getValue()).doubleValue());
+							} else if (entry.getValue() instanceof Boolean) {
+								sdkParams.putBoolean(entry.getKey(), (Boolean) entry.getValue());
+							}
+						}
+						deepLinkData.putMap("sdkParams", sdkParams);
+					}
+					
+					// Add all query parameters
+					WritableMap queryParams = Arguments.createMap();
+					Map<String, String> data = deepLink.getData();
+					for (Map.Entry<String, String> entry : data.entrySet()) {
+						queryParams.putString(entry.getKey(), entry.getValue());
+					}
+					deepLinkData.putMap("queryParams", queryParams);
+					
+					Log.d("TrackierSDK", "Sending comprehensive deep link data to React Native");
+					Log.d("TrackierSDK", "Deep Link Data: " + deepLinkData.toString());
+					sendEvent(getReactApplicationContext(), "trackier_deferredDeeplink", deepLinkData);
 				}
 			});
 		}
@@ -109,6 +153,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 				}
 			}
 		}
+
 		com.trackier.sdk.TrackierSDK.initialize(sdkConfig);
 	}
 
@@ -512,7 +557,7 @@ public class TrackierSDK extends ReactContextBaseJavaModule {
 		return map.hasKey(key) && !map.isNull(key);
 	}
 
-	private void sendEvent(ReactApplicationContext reactContext, String eventName, @Nullable String params) {
+	private void sendEvent(ReactApplicationContext reactContext, String eventName, @Nullable WritableMap params) {
 		reactContext
 				.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
 				.emit(eventName, params);
